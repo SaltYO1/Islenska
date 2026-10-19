@@ -1848,7 +1848,13 @@ function drawScene(c,palName,seed,o){
 }
 function hexA(h,a){h=h.replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
 const banner=key=>`<div class="banner"><canvas data-scene="${key}"></canvas></div>`;
-function paintScenes(){const hs=HERO_SCENES.find(h=>h.id===S.shop.scene);if(hs)SCENES.home=hs.sc;document.querySelectorAll('canvas[data-scene]').forEach(c=>{const sc=SCENES[c.dataset.scene];drawScene(c,sc[0],sc[1],sc[2])})}
+/* шапки страниц: в базовой теме у каждого урока своя погода; в купленной теме — её палитра и эффекты, но свой рельеф у каждой страницы */
+const BANNER_FX={glacier:{},heather:{},dusk:{},storm:{rain:1},night:{aurora:1},frost:{snow:1},veturnaetur:{moon:1,wisps:1,nosun:1}};
+function paintScenes(){const th=S.shop.scene;const hs=HERO_SCENES.find(h=>h.id===th);if(hs)SCENES.home=hs.sc;
+  document.querySelectorAll('canvas[data-scene]').forEach(c=>{const key=c.dataset.scene,sc=SCENES[key];
+    if(key==='home'||!BANNER_FX[th]||!PAL[th])return drawScene(c,sc[0],sc[1],sc[2]);
+    const keepFalls=sc[2].falls&&th!=='veturnaetur'?{falls:sc[2].falls}:{};
+    drawScene(c,th,sc[1],Object.assign(keepFalls,BANNER_FX[th]))})}
 function drawBackdrop(){
   const c=$('#backdrop'),ctx=c.getContext('2d'),W=innerWidth,H=innerHeight,dpr=Math.min(2,devicePixelRatio||1);
   c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
@@ -2482,7 +2488,7 @@ setTimeout(()=>{if(!S.intro&&!hasProgress())showIntro();else{S.intro=true;save()
 
 <script>
 /* офлайн-режим: приложение и озвучка сохраняются на устройстве */
-if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=5f762b7c').catch(()=>{}))}
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=0863a140').catch(()=>{}))}
 </script>
 </body>
 </html>
